@@ -1,4 +1,4 @@
-﻿ckage com.example.backend1.security;
+package com.example.backend1.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

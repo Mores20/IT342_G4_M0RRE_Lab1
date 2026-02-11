@@ -1,57 +1,61 @@
-﻿ckage com.example.backend1.controller;
+package com.example.backend1.controller;
 
-import com.example.backend1.dto.AuthResponse;
-import com.example.backend1.dto.LoginRequest;
-import com.example.backend1.dto.RegisterRequest;
-import com.example.backend1.service.AuthService;
+import com.example.backend1.repository.UserRepository;
+import com.example.backend1.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000")
-@Validated
+@CrossOrigin(origins = "http://localhost:3000") // React
 public class AuthController {
 
     @Autowired
-    private AuthService authService;
+    private UserRepository userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        try {
-            AuthResponse response = authService.register(registerRequest);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(error);
+    public Map<String, String> register(@RequestBody User user) {
+
+        Map<String, String> response = new HashMap<>();
+
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            response.put("message", "Username already exists");
+            return response;
         }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+
+        response.put("message", "User registered successfully");
+        return response;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
-            AuthResponse response = authService.login(loginRequest);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Invalid email or password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        }
-    }
+    public Map<String, String> login(@RequestBody User loginRequest) {
 
-    @GetMapping("/test")
-    public ResponseEntity<?> test() {
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Auth API is working!");
-        response.put("status", "OK");
-        return ResponseEntity.ok(response);
+
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                .orElse(null);
+
+        if (user == null) {
+            response.put("message", "User not found");
+            return response;
+        }
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            response.put("message", "Invalid password");
+            return response;
+        }
+
+        response.put("message", "Login successful");
+        return response;
     }
 }

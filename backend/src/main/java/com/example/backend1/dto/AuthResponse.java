@@ -1,4 +1,4 @@
-﻿ckage com.example.backend1.dto;
+package com.example.backend1.dto;
 
 public class AuthResponse {
     private String token;

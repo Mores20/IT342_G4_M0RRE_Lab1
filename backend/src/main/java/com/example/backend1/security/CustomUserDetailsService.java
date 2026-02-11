@@ -1,4 +1,4 @@
-﻿ckage com.example.backend1.security;
+package com.example.backend1.security;
 
 import com.example.backend1.entity.User;
 import com.example.backend1.repository.UserRepository;

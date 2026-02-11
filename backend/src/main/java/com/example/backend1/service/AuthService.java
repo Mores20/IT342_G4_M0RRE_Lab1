@@ -1,4 +1,4 @@
-﻿ckage com.example.backend1.service;
+package com.example.backend1.service;
 
 import com.example.backend1.dto.AuthResponse;
 import com.example.backend1.dto.LoginRequest;
@@ -46,7 +46,9 @@ public class AuthService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole("USER");
-        user.setIsActive(true);
+    // Activate user after registration
+        user.setActive(true);
+
 
         User savedUser = userRepository.save(user);
 
@@ -61,7 +63,7 @@ public class AuthService {
 
         return new AuthResponse(
                 token,
-                savedUser.getUserId(),
+                savedUser.getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
                 savedUser.getRole()
@@ -87,7 +89,7 @@ public class AuthService {
 
         return new AuthResponse(
                 token,
-                user.getUserId(),
+                user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getRole()
