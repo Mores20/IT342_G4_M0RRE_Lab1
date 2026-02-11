@@ -5,6 +5,7 @@ import './App.css';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import TestBackend from './components/TestBackend';
 
 function App() {
   return (
@@ -15,10 +16,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+
+          <Route path="/test-backend" element={<TestBackend />} />
         </Routes>
       </div>
     </Router>
   );
 }
+
 
 export default App;
